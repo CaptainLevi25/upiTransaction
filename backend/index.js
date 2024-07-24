@@ -9,14 +9,14 @@ app.use(cookieParser());
 const jwt = require('jsonwebtoken');
 
 
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
-
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*"); // Change '*' to your application's origin if needed
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", "*"); // Change '*' to your application's origin if needed
+//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//   next();
+// });
 const connection = async () => {
   try {
     mongoose.connect(
@@ -78,6 +78,14 @@ const User = mongoose.model("User", userSchema);
   }
 };
 
+const logout = (req, res) => {
+  try {
+    res.clearCookie("accesstoken").status(200).send("User logged out successfully");
+  } catch (e) {
+    res.status(500).send("Error in logout");
+  }
+};
+
 const getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -89,6 +97,7 @@ const getUserById = async (req, res) => {
 };
 app.post('/register', register);
 app.post('/login', login);
+app.post('/logout', logout);
 
 //2. Category  Schema
 const categorySchema = new Schema({
